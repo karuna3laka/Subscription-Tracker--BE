@@ -1,20 +1,35 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import { defineConfig } from 'eslint/config';
+import express from 'express';
+import './config/loadEnv.js';
+import cookieParser from 'cookie-parser';
 
-export default defineConfig([
-  {
-    files: ['**/*.{js,mjs,cjs}'],
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'module',
-      globals: globals.node,
-    },
-    plugins: { js },
-    extends: ['eslint:recommended'],
-    rules: {
-      semi: ['error', 'always'],
-      quotes: ['error', 'single'],
-    },
-  },
-]);
+import userRouter from './routes/user.routes.js';
+import authRouter from './routes/auth.routes.js';
+import subscriptionRouter from './routes/subscription.routes.js';
+
+import connectToDatabase from './database/mongodb.js';
+import errorMiddleware from './middlewares/error.middleware.js';
+
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/subscriptions', subscriptionRouter);
+
+app.use(errorMiddleware);
+
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.send('Subscription Tracker API Running!');
+});
+
+app.listen(PORT, async () => {
+  console.log(`Server running at: http://localhost:${PORT}`);
+  await connectToDatabase();
+});
+
+export default app;
