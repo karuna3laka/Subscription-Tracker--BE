@@ -15,7 +15,7 @@ config({ path: envPath });
 
 console.log(`Loaded environment: ${nodeEnv}`);
 
-// ✅ Export values manually
+// Export values manually
 export const DB_URI = process.env.DB_URI;
 export const NODE_ENV = process.env.NODE_ENV;
 export const PORT = process.env.PORT;
